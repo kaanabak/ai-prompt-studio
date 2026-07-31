@@ -1,24 +1,33 @@
-@echo off
-setlocal
-cd /d "%~dp0"
-if not exist ".venv\Scripts\python.exe" (
-  py -3 -m venv .venv
-  if errorlevel 1 goto :error
-)
-".venv\Scripts\python.exe" -m pip install --disable-pip-version-check -r requirements.txt
-if errorlevel 1 goto :error
-start "" ".venv\Scripts\pythonw.exe" app.py
-powershell -NoProfile -Command "$ready=$false; for($i=0;$i -lt 20;$i++){try{if((Invoke-WebRequest -UseBasicParsing 'http://127.0.0.1:5000/health' -TimeoutSec 1).StatusCode -eq 200){$ready=$true; break}}catch{}; Start-Sleep -Milliseconds 500}; if(-not $ready){exit 1}"
-if errorlevel 1 (
-  echo PromptForge did not become ready at http://127.0.0.1:5000.
-  echo Close any other app using port 5000, then try again.
-  pause
-  exit /b 1
-)
-start "" http://127.0.0.1:5000
-exit /b 0
+# Code of Conduct
 
-:error
-echo PromptForge could not start. Check that Python 3 is installed and try again.
-pause
-exit /b 1
+## Our pledge
+
+We as members, contributors, and maintainers pledge to make participation in
+our project a harassment-free experience for everyone, regardless of age,
+body size, disability, ethnicity, gender identity and expression, level of
+experience, nationality, personal appearance, race, religion, or sexual
+identity and orientation.
+
+## Our standards
+
+Examples of behavior that contributes to a positive environment:
+
+- Being respectful of differing viewpoints and experiences
+- Giving and gracefully accepting constructive feedback
+- Focusing on what is best for the community
+
+Examples of unacceptable behavior:
+
+- Harassment, insults, or derogatory comments, public or private
+- Publishing others' private information without explicit permission
+- Other conduct which could reasonably be considered inappropriate
+
+## Enforcement
+
+Instances of abusive or otherwise unacceptable behavior may be reported by
+opening a confidential issue or contacting the maintainers directly. All
+complaints will be reviewed and investigated promptly and fairly.
+
+## Attribution
+
+This Code of Conduct is adapted from the [Contributor Covenant](https://www.contributor-covenant.org/), version 2.1.
