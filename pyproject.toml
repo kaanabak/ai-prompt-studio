@@ -1,1 +1,13 @@
-{% extends "base.html" %}{% block content %}<h1>Create a prompt</h1><form method="post"><label>Topic<input name="topic" required></label><label>Audience<input name="audience" placeholder="e.g. beginner marketers"></label><label>Tone<input name="tone" placeholder="e.g. clear and helpful"></label><button>Generate</button></form>{% if result %}<form method="post" action="/prompts"><label>Title<input name="title" value="New prompt" required></label><label>Prompt<textarea name="body" rows="8" required>{{ result }}</textarea></label><label>Tags<input name="tags" placeholder="marketing, content"></label><button>Save to library</button></form>{% endif %}{% endblock %}
+# PromptForge is intentionally distributed as a runnable script (see run.sh /
+# run.bat), not an installable package, so this file only configures dev
+# tooling — no [project]/[build-system] here.
+
+[tool.ruff]
+line-length = 110
+target-version = "py39"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

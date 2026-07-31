@@ -1,42 +1,26 @@
-name: CI
+FROM python:3.12-slim
 
-on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
+WORKDIR /app
 
-jobs:
-  test:
-    name: Test (${{ matrix.os }}, Python ${{ matrix.python-version }})
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-        python-version: ["3.9", "3.12"]
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-    steps:
-      - uses: actions/checkout@v4
+COPY app.py .
+COPY templates/ templates/
+COPY static/ static/
 
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python-version }}
+RUN useradd --create-home appuser \
+ && mkdir -p /app/data \
+ && chown -R appuser:appuser /app
+USER appuser
 
-      - name: Install dependencies
-        run: pip install -r requirements-dev.txt
+ENV PROMPTFORGE_HOST=0.0.0.0 \
+    PROMPTFORGE_PORT=5000 \
+    PROMPTFORGE_DATA_DIR=/app/data
 
-      - name: Lint with ruff
-        run: ruff check .
+EXPOSE 5000
+VOLUME ["/app/data"]
 
-      - name: Run tests
-        run: pytest -v
+HEALTHCHECK --interval=30s --timeout=3s CMD python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:5000/health')" || exit 1
 
-  docker:
-    name: Docker build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Build image
-        run: docker build -t promptforge:ci .
+CMD ["python", "app.py"]

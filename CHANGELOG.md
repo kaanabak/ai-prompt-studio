@@ -1,1 +1,35 @@
-{% extends "base.html" %}{% block content %}<h1>Prompt library</h1><form><input name="q" value="{{ query }}" placeholder="Search prompts">{% if active_tag %}<input type="hidden" name="tag" value="{{ active_tag }}">{% endif %}<button>Search</button></form><p><a class="button" href="/export">Download backup</a><a class="button" href="/prompts{{ '?tag=' + active_tag if active_tag else '' }}{{ '&' if active_tag else '?' }}favorites={{ 0 if only_favorites else 1 }}">{{ 'Show all' if only_favorites else 'Show favorites only' }}</a></p><form method="post" action="/import" enctype="multipart/form-data" class="inline-form"><input type="file" name="backup" accept="application/json"><button>Import backup</button></form>{% for tag in tags %}<a class="tag" href="/prompts?tag={{ tag }}">{{ tag }}</a>{% endfor %}{% for p in prompts %}<article><h3>{{ '★ ' if p.favorite else '' }}{{ p.title }}</h3>{% for tag in p.tags %}<span class="tag">{{ tag }}</span>{% endfor %}<pre>{{ p.body }}</pre><small>{{ p.updated_at or p.created_at }}</small><p><button type="button" onclick="navigator.clipboard.writeText(this.closest('article').querySelector('pre').innerText)">Copy</button><a class="button" href="/prompts/{{ p.id }}/edit">Edit</a></p><form method="post" action="/prompts/{{ p.id }}/favorite"><button>{{ 'Unfavorite' if p.favorite else 'Favorite' }}</button></form><form method="post" action="/prompts/{{ p.id }}/delete" onsubmit="return confirm('Delete this prompt?')"><button class="danger">Delete</button></form></article>{% else %}<p>No prompts saved yet.</p>{% endfor %}{% endblock %}
+# Changelog
+
+All notable changes to this project are documented in this file.
+The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
+
+## [Unreleased]
+
+### Added
+
+- `run.sh` launcher for macOS and Linux (parity with `run.bat`).
+- `Dockerfile` and `.dockerignore` for running PromptForge in a container.
+- Edit prompt feature (`/prompts/<id>/edit`).
+- Import a JSON backup to merge prompts back into the library (`/import`).
+- "Favorites only" filter in the library view.
+- User feedback via flash messages (save/update/delete/import confirmations).
+- `PROMPTFORGE_HOST`, `PROMPTFORGE_PORT`, `PROMPTFORGE_DATA_DIR`,
+  `PROMPTFORGE_DEBUG`, and `PROMPTFORGE_SECRET_KEY` environment variables.
+- Test suite (`tests/test_app.py`, 18 tests) and CI workflow.
+- `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `LICENSE`, GitHub issue/PR templates.
+
+### Changed
+
+- `prompts()` now filters out malformed entries instead of raising a
+  `KeyError` in the middle of a request.
+- `favorite()` redirects back to the referring page instead of always to
+  the library.
+
+### Fixed
+
+- Missing `LICENSE` file (README badge referenced MIT but none was present).
+
+## [0.1.0] - initial release
+
+- Generate, save, tag, search, favorite, delete, and export prompts.
+- Windows one-click launcher (`run.bat`).
